@@ -13,16 +13,7 @@ version = "1.0.0-SNAPSHOT"
 repositories {
     mavenCentral()
 }
-ext {
-    vertxVersion = '4.5.8'
-    junitJupiterVersion = '5.9.1'
 
-//    mainVerticleName = 'com.aram.practice.sensors.Main'
-//    launcherClassName = 'io.vertx.core.Launcher'
-//
-//    watchForChange = 'src/**/*'
-//    doOnChange = "${projectDir}/gradlew classes"
-}
 
 application {
     mainClassName = 'com.aram.practice.sensors.Main' // Replace with your actual main class
