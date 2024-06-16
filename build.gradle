@@ -1,0 +1,94 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
+plugins {
+  id 'java'
+  id 'application'
+  id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+// refernce https://www.youtube.com/watch?v=pSKY3-K9_qc
+//group = 'com.aram.practice'
+//version = '1.0.0-SNAPSHOT'
+
+repositories {
+  mavenCentral()
+}
+
+ext {
+  vertxVersion = '4.5.8'
+  junitJupiterVersion = '5.9.1'
+
+  mainVerticleName = 'com.aram.practice.sensors.store.MainVerticle'
+  launcherClassName = 'io.vertx.core.Launcher'
+
+  watchForChange = 'src/**/*'
+  doOnChange = "${projectDir}/gradlew classes"
+}
+
+application {
+  mainClassName = launcherClassName
+}
+
+// configuration for only subprojects
+subprojects {
+  apply plugin: 'java'
+  apply plugin: 'com.github.johnrengelman.shadow'
+  task('hello').doLast{
+    println "I'm $project.name"
+  }
+}
+
+allprojects {
+  group = 'com.aram.practice'
+  version = '1.0.0-SNAPSHOT'
+
+  apply plugin: 'java'
+  apply plugin: 'com.github.johnrengelman.shadow'
+  repositories {
+    mavenCentral()
+    mavenLocal()
+  }
+
+  java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
+
+  dependencies {
+    implementation platform("io.vertx:vertx-stack-depchain:$vertxVersion")
+    implementation 'io.vertx:vertx-health-check'
+    implementation 'io.vertx:vertx-web'
+    implementation 'io.vertx:vertx-mysql-client'
+    implementation 'io.vertx:vertx-shell'
+    testImplementation 'io.vertx:vertx-junit5'
+    testImplementation "org.junit.jupiter:junit-jupiter:$junitJupiterVersion"
+  }
+
+
+}
+
+
+
+//java {
+//  sourceCompatibility = JavaVersion.VERSION_17
+//  targetCompatibility = JavaVersion.VERSION_17
+//}
+
+tasks.withType(ShadowJar) {
+  archiveClassifier.set('fat')
+  manifest {
+    attributes 'Main-Verticle': mainVerticleName
+  }
+  mergeServiceFiles()
+}
+
+tasks.withType(Test) {
+  useJUnitPlatform()
+  testLogging {
+    events = [TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED] as Set
+  }
+}
+
+tasks.withType(JavaExec) {
+  args = ['run', mainVerticleName, "--redeploy=$watchForChange", "--launcher-class=$launcherClassName", "--on-redeploy=$doOnChange"]
+}

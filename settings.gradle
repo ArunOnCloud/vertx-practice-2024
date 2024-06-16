@@ -1,0 +1,4 @@
+rootProject.name = "vertx-practice-2024"
+include("temperature-sensors")
+include 'temperature-store'
+
