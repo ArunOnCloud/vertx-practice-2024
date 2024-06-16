@@ -4,6 +4,7 @@ package com.aram.practice.sensors;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import org.slf4j.Logger;
@@ -19,7 +20,9 @@ public class Main  {
     // to see how IntelliJ IDEA suggests fixing it.
 
     Vertx vertx = Vertx.vertx();
-    vertx.deployVerticle(new SensorVerticle());
+    //vertx.deployVerticle(new SensorVerticle());
+    //vertx.deployVerticle()
+    vertx.deployVerticle(SensorVerticle.class,new DeploymentOptions().setInstances(4));
     logger.info(" Main method verticle");
 
   }
