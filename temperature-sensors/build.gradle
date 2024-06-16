@@ -1,6 +1,11 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id("java")
 }
+
+apply plugin: 'java'
+apply plugin: 'application'
 
 group = "com.aram.practice"
 version = "1.0.0-SNAPSHOT"
@@ -8,12 +13,47 @@ version = "1.0.0-SNAPSHOT"
 repositories {
     mavenCentral()
 }
+ext {
+    vertxVersion = '4.5.8'
+    junitJupiterVersion = '5.9.1'
+
+//    mainVerticleName = 'com.aram.practice.sensors.Main'
+//    launcherClassName = 'io.vertx.core.Launcher'
+//
+//    watchForChange = 'src/**/*'
+//    doOnChange = "${projectDir}/gradlew classes"
+}
+
+application {
+    mainClassName = 'com.aram.practice.sensors.Main' // Replace with your actual main class
+}
+
+
 
 dependencies {
+    implementation 'ch.qos.logback:logback-classic:1.4.11'
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.86.Final:osx-aarch_64' // Replace with the latest version if available
+
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+tasks.withType(ShadowJar) {
+    archiveClassifier.set('fat')
+    manifest {
+        attributes 'Main-Verticle': mainVerticleName
+    }
+    mergeServiceFiles()
+}
+
+tasks.withType(JavaExec) {
+    args = ['run', mainVerticleName, "--redeploy=$watchForChange", "--launcher-class=$launcherClassName", "--on-redeploy=$doOnChange"]
+}
+
+tasks.named('run') {
+   // args = ['arg1', 'arg2'] // Replace with your actual arguments if any
+   // jvmArgs = ['-Xmx1024m'] // Replace with your actual JVM arguments if any
 }
