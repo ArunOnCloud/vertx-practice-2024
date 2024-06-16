@@ -22,7 +22,7 @@ public class Main  {
     Vertx vertx = Vertx.vertx();
     //vertx.deployVerticle(new SensorVerticle());
     //vertx.deployVerticle()
-    vertx.deployVerticle(SensorVerticle.class,new DeploymentOptions().setInstances(4));
+    vertx.deployVerticle(SensorVerticle.class,new DeploymentOptions().setInstances(1));
     logger.info(" Main method verticle");
 
   }

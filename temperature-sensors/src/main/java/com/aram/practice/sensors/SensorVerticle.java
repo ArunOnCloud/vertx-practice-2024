@@ -2,6 +2,9 @@ package com.aram.practice.sensors;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +23,32 @@ public class SensorVerticle extends AbstractVerticle {
     @Override
     public void start(Promise<Void> startPromise){
         vertx.setPeriodic(2000, this::updateTemperature);
+
+        Router router = Router.router(vertx);
+        router.get("/data").handler(this::getData);
+        vertx.createHttpServer()
+                .requestHandler(router)
+                        .listen(httpPort)
+                                .onSuccess(ok ->{
+                                    logger.info("http server running: http://127.0.0.1:{}",httpPort);
+                                    startPromise.complete();
+                                }).onFailure(startPromise::fail);
+
         logger.info("Started verticle:SensorVerticle");
-        startPromise.complete();
+
+    }
+
+    private void getData(RoutingContext context) {
+        logger.info("Processing HTTP request from {}",context.request().remoteAddress());
+        JsonObject payload = new JsonObject()
+                .put("uuid",uuid)
+                .put("temperature",temperature)
+                .put("timestamp",System.currentTimeMillis());
+        context.response()
+                .putHeader("Content-Type","application/json")
+                .setStatusCode(200)
+                .end(payload.encode());
+
     }
 
     private void updateTemperature(Long aLong) {
