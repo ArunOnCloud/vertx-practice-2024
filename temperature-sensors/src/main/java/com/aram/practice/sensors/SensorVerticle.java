@@ -40,10 +40,7 @@ public class SensorVerticle extends AbstractVerticle {
 
     private void getData(RoutingContext context) {
         logger.info("Processing HTTP request from {}",context.request().remoteAddress());
-        JsonObject payload = new JsonObject()
-                .put("uuid",uuid)
-                .put("temperature",temperature)
-                .put("timestamp",System.currentTimeMillis());
+        JsonObject payload = createPaylod();
         context.response()
                 .putHeader("Content-Type","application/json")
                 .setStatusCode(200)
@@ -51,10 +48,19 @@ public class SensorVerticle extends AbstractVerticle {
 
     }
 
+    private JsonObject createPaylod() {
+        JsonObject payload = new JsonObject()
+                .put("uuid",uuid)
+                .put("temperature",temperature)
+                .put("timestamp",System.currentTimeMillis());
+        return payload;
+    }
+
     private void updateTemperature(Long aLong) {
 
         temperature = temperature + (random.nextGaussian() / 2.0d);
         logger.info("Temperature updated: {}",temperature);
+        vertx.eventBus().publish("temperature.updates",createPaylod());
     }
 
 
