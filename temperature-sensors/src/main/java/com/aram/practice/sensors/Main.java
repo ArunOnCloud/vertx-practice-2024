@@ -17,12 +17,9 @@ public class Main  {
   private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
   public static void main(String[] args) {
-    //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-    // to see how IntelliJ IDEA suggests fixing it.
 
     Vertx vertx = Vertx.vertx();
-    //vertx.deployVerticle(new SensorVerticle());
-    //vertx.deployVerticle()
+
     vertx.deployVerticle(SensorVerticle.class,new DeploymentOptions().setInstances(1));
     logger.info(" Main method verticle");
 
@@ -31,19 +28,5 @@ public class Main  {
     });
   }
 
-//  @Override
-//  public void start(Promise<Void> startPromise) throws Exception {
-//    vertx.createHttpServer().requestHandler(req -> {
-//      req.response()
-//              .putHeader("content-type", "text/plain")
-//              .end("Hello from Vert.x!");
-//    }).listen(8888, http -> {
-//      if (http.succeeded()) {
-//        startPromise.complete();
-//        System.out.println("HTTP server started on port 8888");
-//      } else {
-//        startPromise.fail(http.cause());
-//      }
-//    });
-//  }
+
 }
